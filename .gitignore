@@ -37,4 +37,8 @@ __pycache__/
 # ===== 本地子仓库（hj/ 是本地独立 git 仓库，不纳入主仓） =====
 /hj/
 
-# ===== SQL 脚本需要提交（已由 .env 单独排除密码） =====
+# ===== SQL / Python 脚本不纳入版本控制（本地脚本，不提交远程） =====
+*.sql
+*.py
+# 例外：FastAdmin 框架安装 SQL 保留跟踪
+!application/admin/command/Install/fastadmin.sql

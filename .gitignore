@@ -1,20 +1,40 @@
-﻿/nbproject/
+# ===== 框架/依赖 =====
+/nbproject/
 /thinkphp/
 /vendor/
 /runtime/*
+!/runtime/.gitkeep
+!/runtime/.htaccess
 /addons/*
+!/addons/.gitkeep
 /public/assets/libs/
 /public/assets/addons/*
 /public/uploads/*
-.DS_Store
-.idea
+!/public/uploads/.gitkeep
 composer.lock
+
+# ===== 环境/配置（含密码） =====
+.env
+.user.ini
+
+# ===== IDE =====
+.DS_Store
+.idea/
+.svn
+.vscode/
+
+# ===== 构建产物 =====
+node_modules/
 *.log
 *.css.map
 !.gitkeep
-.env
-.svn
-.vscode
-node_modules
-.user.ini
-# SQL 脚本需要提交（初始化脚本、配置脚本等），密码已由 .env 单独排除
+
+# ===== 临时数据 =====
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== 本地子仓库 =====
+/hj/
+
+# ===== SQL 脚本需要提交 =====

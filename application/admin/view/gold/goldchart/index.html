@@ -1,0 +1,419 @@
+<link href="__CDN__/assets/libs/layui/css/layui.css" rel="stylesheet">
+<style>
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        font-family: "Microsoft YaHei", sans-serif;
+    }
+    .chart-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 215, 0, 0.2);
+    }
+    .chart-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    .chart-title {
+        font-size: 28px;
+        font-weight: bold;
+        background: linear-gradient(90deg, #FFD700, #FFA500, #FF8C00);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 4px;
+        margin-bottom: 8px;
+    }
+    .chart-subtitle {
+        color: rgba(255, 215, 0, 0.7);
+        font-size: 14px;
+        letter-spacing: 2px;
+    }
+    .filter-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+    .filter-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .filter-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .filter-input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        border-radius: 8px;
+        padding: 8px 14px;
+        color: #fff;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s;
+    }
+    .filter-input:focus {
+        border-color: #FFD700;
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+    .filter-input option {
+        background: #1a1a2e;
+        color: #fff;
+    }
+    .btn-gold {
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 9px 24px;
+        color: #1a1a2e;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        letter-spacing: 2px;
+    }
+    .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    }
+    .btn-gold:active {
+        transform: translateY(0);
+    }
+    .quick-btn {
+        background: rgba(255, 215, 0, 0.15);
+        border: 1px solid rgba(255, 215, 0, 0.4);
+        border-radius: 6px;
+        padding: 6px 14px;
+        color: #FFD700;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .quick-btn:hover {
+        background: rgba(255, 215, 0, 0.3);
+    }
+    #priceChart {
+        width: 100%;
+        height: 600px;
+        border-radius: 12px;
+    }
+    .stats-bar {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+    .stat-item {
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #FFD700;
+    }
+    .stat-value.up { color: #ff4757; }
+    .stat-value.down { color: #2ed573; }
+    .stat-label {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 4px;
+    }
+</style>
+
+<div class="chart-container">
+    <div class="chart-header">
+        <div class="chart-title">黄金价格走势</div>
+        <div class="chart-subtitle">GOLD PRICE TREND CHART</div>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-item">
+            <span class="filter-label">产品</span>
+            <select id="product_id" class="filter-input">
+                {foreach $products as $p}
+                <option value="{$p.id}">{$p.bank_name} {$p.product_name}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="filter-item">
+            <span class="filter-label">开始</span>
+            <input type="text" id="start_date" class="filter-input" placeholder="开始日期" readonly>
+        </div>
+        <div class="filter-item">
+            <span class="filter-label">结束</span>
+            <input type="text" id="end_date" class="filter-input" placeholder="结束日期" readonly>
+        </div>
+        <button class="btn-gold" onclick="loadChart()">查 询</button>
+        <button class="quick-btn" onclick="setToday()">今日</button>
+        <button class="quick-btn" onclick="setYesterday()">昨日</button>
+        <button class="quick-btn" onclick="setRange(7)">近7天</button>
+        <button class="quick-btn" onclick="setRange(30)">近30天</button>
+        <button class="quick-btn" onclick="setRange(90)">近90天</button>
+    </div>
+
+    <div id="priceChart"></div>
+
+    <div class="stats-bar" id="statsBar" style="display:none;">
+        <div class="stat-item">
+            <div class="stat-value" id="statCurrent">--</div>
+            <div class="stat-label">最新价 (元/克)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value up" id="statHigh">--</div>
+            <div class="stat-label">区间最高</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value down" id="statLow">--</div>
+            <div class="stat-label">区间最低</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statChange">--</div>
+            <div class="stat-label">涨跌幅</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="statAvg">--</div>
+            <div class="stat-label">平均价</div>
+        </div>
+    </div>
+</div>
+
+<script src="__CDN__/assets/libs/jquery/dist/jquery.min.js"></script>
+<script src="__CDN__/assets/libs/layui/layui.js"></script>
+<script src="__CDN__/assets/libs/echarts/dist/echarts.min.js"></script>
+<script>
+var chart = null;
+var laydate = null;
+
+layui.use(['laydate'], function(){
+    laydate = layui.laydate;
+    var today = new Date();
+    var weekAgo = new Date(today.getTime() - 7 * 24 * 3600 * 1000);
+
+    laydate.render({
+        elem: '#start_date',
+        type: 'date',
+        value: formatDate(weekAgo),
+        theme: '#FFD700',
+        done: function(value){ loadChart(); }
+    });
+    laydate.render({
+        elem: '#end_date',
+        type: 'date',
+        value: formatDate(today),
+        theme: '#FFD700',
+        done: function(value){ loadChart(); }
+    });
+
+    chart = echarts.init(document.getElementById('priceChart'));
+    window.addEventListener('resize', function(){ chart.resize(); });
+    loadChart();
+});
+
+function formatDate(d){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function setRange(days){
+    var today = new Date();
+    var start = new Date(today.getTime() - days * 24 * 3600 * 1000);
+    document.getElementById('start_date').value = formatDate(start);
+    document.getElementById('end_date').value = formatDate(today);
+    loadChart();
+}
+
+function setToday(){
+    var today = new Date();
+    document.getElementById('start_date').value = formatDate(today);
+    document.getElementById('end_date').value = formatDate(today);
+    loadChart();
+}
+
+function setYesterday(){
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    document.getElementById('start_date').value = formatDate(yesterday);
+    document.getElementById('end_date').value = formatDate(yesterday);
+    loadChart();
+}
+
+function loadChart(){
+    var product_id = document.getElementById('product_id').value;
+    var start_date = document.getElementById('start_date').value;
+    var end_date   = document.getElementById('end_date').value;
+
+    $.ajax({
+        url: 'gold/goldchart/data',
+        type: 'GET',
+        dataType: 'json',
+        data: { product_id: product_id, start_date: start_date, end_date: end_date },
+        success: function(res){
+            if(res.code == 1){
+                renderChart(res.data);
+            } else {
+                alert(res.msg || '数据加载失败');
+            }
+        },
+        error: function(){
+            alert('请求失败');
+        }
+    });
+}
+
+function renderChart(d){
+    var option = {
+        backgroundColor: 'transparent',
+        title: {
+            text: d.product_name + '  价格走势图',
+            left: 'center',
+            top: 10,
+            textStyle: {
+                color: '#FFD700',
+                fontSize: 18,
+                fontWeight: 'bold',
+                letterSpacing: 3
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+            backgroundColor: 'rgba(20,20,40,0.9)',
+            borderColor: '#FFD700',
+            borderWidth: 1,
+            textStyle: { color: '#fff' },
+            formatter: function(params){
+                var p = params[0];
+                var idx = p.dataIndex;
+                var avg = d.avg[idx];
+                var min = d.min[idx];
+                var max = d.max[idx];
+                return '<div style="font-weight:bold;color:#FFD700;margin-bottom:5px;">' + d.xAxis[idx] + '</div>'
+                    + '<div>均价: <span style="color:#FFD700;font-weight:bold;">' + avg + ' 元/克</span></div>'
+                    + '<div>最高: <span style="color:#ff4757;">' + max + ' 元/克</span></div>'
+                    + '<div>最低: <span style="color:#2ed573;">' + min + ' 元/克</span></div>'
+                    + '<div style="color:#aaa;font-size:11px;margin-top:4px;">采样: ' + d.granularity + '</div>';
+            }
+        },
+        legend: {
+            data: ['均价', '最高', '最低'],
+            top: 45,
+            textStyle: { color: 'rgba(255,255,255,0.7)' },
+            itemWidth: 25,
+            itemHeight: 10
+        },
+        grid: {
+            left: '5%',
+            right: '5%',
+            bottom: '15%',
+            top: '20%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: d.xAxis,
+            axisLine: { lineStyle: { color: 'rgba(255,215,0,0.3)' } },
+            axisLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11, rotate: d.granularity === 'hour' ? 45 : 0 },
+            axisTick: { show: false }
+        },
+        yAxis: {
+            type: 'value',
+            name: '价格 (元/克)',
+            nameTextStyle: { color: 'rgba(255,215,0,0.7)' },
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { color: 'rgba(255,255,255,0.7)', formatter: '{value}' },
+            splitLine: { lineStyle: { color: 'rgba(255,215,0,0.1)', type: 'dashed' } }
+        },
+        dataZoom: [
+            { type: 'inside', start: 0, end: 100 },
+            { type: 'slider', height: 15, bottom: 20, borderColor: 'rgba(255,215,0,0.3)',
+                backgroundColor: 'rgba(255,255,255,0.05)', fillerColor: 'rgba(255,215,0,0.3)',
+                handleStyle: { color: '#FFD700' },
+                textStyle: { color: 'rgba(255,255,255,0.5)' }
+            }
+        ],
+        series: [
+            {
+                name: '均价',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 6,
+                data: d.avg,
+                lineStyle: { width: 3, color: '#FFD700' },
+                itemStyle: { color: '#FFD700', borderColor: '#fff', borderWidth: 2 },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(255,215,0,0.4)' },
+                        { offset: 0.5, color: 'rgba(255,165,0,0.2)' },
+                        { offset: 1, color: 'rgba(255,140,0,0.02)' }
+                    ])
+                },
+                emphasis: {
+                    itemStyle: { color: '#FFD700', borderColor: '#fff', borderWidth: 3, shadowBlur: 15, shadowColor: 'rgba(255,215,0,0.6)' }
+                }
+            },
+            {
+                name: '最高',
+                type: 'line',
+                smooth: true,
+                symbol: 'none',
+                data: d.max,
+                lineStyle: { width: 1.5, color: '#ff4757', type: 'dashed' },
+                itemStyle: { color: '#ff4757' }
+            },
+            {
+                name: '最低',
+                type: 'line',
+                smooth: true,
+                symbol: 'none',
+                data: d.min,
+                lineStyle: { width: 1.5, color: '#2ed573', type: 'dashed' },
+                itemStyle: { color: '#2ed573' }
+            }
+        ]
+    };
+    chart.setOption(option);
+
+    // stats
+    if(d.avg.length > 0){
+        document.getElementById('statsBar').style.display = 'flex';
+        var current = d.avg[d.avg.length - 1];
+        var first = d.avg[0];
+        var high = Math.max.apply(null, d.max);
+        var low = Math.min.apply(null, d.min);
+        var avg = (d.avg.reduce(function(a,b){return a+b;},0) / d.avg.length).toFixed(2);
+        var change = (current - first).toFixed(2);
+        var changePct = ((change / first) * 100).toFixed(2);
+
+        document.getElementById('statCurrent').textContent = current;
+        document.getElementById('statHigh').textContent = high;
+        document.getElementById('statLow').textContent = low;
+        document.getElementById('statAvg').textContent = avg;
+
+        var changeEl = document.getElementById('statChange');
+        if(change >= 0){
+            changeEl.textContent = '+' + change + ' (+' + changePct + '%)';
+            changeEl.className = 'stat-value up';
+        } else {
+            changeEl.textContent = change + ' (' + changePct + '%)';
+            changeEl.className = 'stat-value down';
+        }
+    } else {
+        document.getElementById('statsBar').style.display = 'none';
+    }
+}
+</script>

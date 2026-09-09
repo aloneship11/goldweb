@@ -1,0 +1,93 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <input type="hidden" name="row[id]" value="{$row.id|htmlentities}">
+    <div class="form-group">
+        <label for="c-username" class="control-label col-xs-12 col-sm-2">{:__('Username')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-username" data-rule="required" class="form-control" name="row[username]" type="text" value="{$row.username|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-nickname" class="control-label col-xs-12 col-sm-2">{:__('Nickname')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-nickname" data-rule="required" class="form-control" name="row[nickname]" type="text" value="{$row.nickname|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-password" class="control-label col-xs-12 col-sm-2">{:__('Password')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-password" data-rule="password" class="form-control" name="row[password]" type="password" value="" placeholder="{:__('Leave password blank if dont want to change')}" autocomplete="new-password" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-email" class="control-label col-xs-12 col-sm-2">{:__('Email')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-email" data-rule="email" class="form-control" name="row[email]" type="text" value="{$row.email|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-mobile" class="control-label col-xs-12 col-sm-2">{:__('Mobile')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-mobile" data-rule="mobile" class="form-control" name="row[mobile]" type="text" value="{$row.mobile|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-expiretime" class="control-label col-xs-12 col-sm-2">到期时间:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-expiretime" data-rule="" class="form-control datetimepicker" data-date-format="YYYY-MM-DD HH:mm:ss" data-use-current="true" name="row[expiretime]" type="text" value="{$row.expiretime|datetime}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-alert_email" class="control-label col-xs-12 col-sm-2">提醒邮箱:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-alert_email" data-rule="email" class="form-control" name="row[alert_email]" type="text" value="{$row.alert_email|htmlentities}" placeholder="为空则使用账号邮箱">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">基准价提醒:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[base_alert]', ['1'=>'开启', '0'=>'关闭'], $row['base_alert'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">最高最低点提醒:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[highlow_alert]', ['1'=>'开启', '0'=>'关闭'], $row['highlow_alert'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-alert_threshold" class="control-label col-xs-12 col-sm-2">基准价波动阈值(元):</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-alert_threshold" data-rule="required" class="form-control" name="row[alert_threshold]" type="number" step="0.01" value="{$row.alert_threshold|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-highlow_step" class="control-label col-xs-12 col-sm-2">新高低通知步长(元):</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-highlow_step" data-rule="required" class="form-control" name="row[highlow_step]" type="number" step="0.01" value="{$row.highlow_step|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-dnd_start" class="control-label col-xs-12 col-sm-2">免打扰时段(起止小时):</label>
+        <div class="col-xs-12 col-sm-4">
+            <div class="input-group">
+                <input id="c-dnd_start" data-rule="required" class="form-control" name="row[dnd_start]" type="number" min="0" max="23" value="{$row.dnd_start|htmlentities}">
+                <span class="input-group-addon">~</span>
+                <input id="c-dnd_end" data-rule="required" class="form-control" name="row[dnd_end]" type="number" min="0" max="23" value="{$row.dnd_end|htmlentities}">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['normal'=>__('Normal'), 'hidden'=>__('Hidden')], $row['status'])}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,20 @@
+﻿/nbproject/
+/thinkphp/
+/vendor/
+/runtime/*
+/addons/*
+/public/assets/libs/
+/public/assets/addons/*
+/public/uploads/*
+.DS_Store
+.idea
+composer.lock
+*.log
+*.css.map
+!.gitkeep
+.env
+.svn
+.vscode
+node_modules
+.user.ini
+# SQL 脚本需要提交（初始化脚本、配置脚本等），密码已由 .env 单独排除

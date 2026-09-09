@@ -1,0 +1,44 @@
+<form id="subscribe-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="user/user/subscribe/ids/{$row.id}">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">会员:</label>
+        <div class="col-xs-12 col-sm-8">
+            <p class="form-control-static">{$row.nickname|htmlentities}（{$row.mobile|htmlentities}）</p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-product_id" class="control-label col-xs-12 col-sm-2">添加订阅:</label>
+        <div class="col-xs-12 col-sm-6">
+            <div class="input-group">
+                <select id="c-product_id" name="product_id" class="form-control selectpicker" data-rule="required">
+                    <option value="">请选择产品</option>
+                    {foreach name="products" item="p"}
+                    <option value="{$p.id}">{$p.bank_name} - {$p.product_name}</option>
+                    {/foreach}
+                </select>
+                <span class="input-group-btn"><button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> 添加</button></span>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="form-group">
+    <label class="control-label col-xs-12 col-sm-2">已订阅产品:</label>
+    <div class="col-xs-12 col-sm-8">
+        <table class="table table-bordered table-striped">
+            <thead><tr><th>产品</th><th width="80">状态</th><th width="100">操作</th></tr></thead>
+            <tbody>
+            {foreach name="subscribed" item="s"}
+            <tr>
+                <td>{$s.bank_name} - {$s.product_name}</td>
+                <td>{eq name="s.status" value="1"}<span class="label label-success">启用</span>{else/}<span class="label label-default">停用</span>{/eq}</td>
+                <td><button type="button" class="btn btn-xs btn-danger btn-unsubscribe" data-id="{$s.id}">取消订阅</button></td>
+            </tr>
+            {/foreach}
+            {empty name="subscribed"}
+            <tr><td colspan="3" class="text-center text-muted">暂无订阅</td></tr>
+            {/empty}
+            </tbody>
+        </table>
+    </div>
+</div>

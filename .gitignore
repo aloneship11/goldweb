@@ -40,5 +40,3 @@ __pycache__/
 # ===== SQL / Python 脚本不纳入版本控制（本地脚本，不提交远程） =====
 *.sql
 *.py
-# 例外：FastAdmin 框架安装 SQL 保留跟踪
-!application/admin/command/Install/fastadmin.sql
